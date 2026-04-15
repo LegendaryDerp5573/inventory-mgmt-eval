@@ -1,49 +1,48 @@
-"""FastAPI backend for the blank environment.
+"""FastAPI backend for inventory management environment."""
 
-This provides the stateful counter service that the environment tools interact with.
-"""
-
+from contextlib import asynccontextmanager
 import logging
+from pathlib import Path
 import sys
 
 from fastapi import FastAPI
+import uvicorn
+
+from inventory import database
+from inventory import inventory as inventory_service
+from inventory import members as members_service
 
 logging.basicConfig(
     stream=sys.stderr,
     level=logging.INFO,
     format="[%(levelname)s] %(asctime)s | %(name)s | %(message)s",
 )
+logger = logging.getLogger(__name__)
+_ = (inventory_service, members_service)
+DB_PATH = Path(__file__).resolve().parent.parent / "inventory" / "inventory.db"
 
-app = FastAPI(title="Blank Environment Backend")
 
-# In-memory state
-_count = 0
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    database.setup(str(DB_PATH))
+    yield
+
+
+app = FastAPI(title="Inventory Management Backend", lifespan=lifespan)
 
 
 @app.get("/health")
 def health():
-    """Health check endpoint."""
     return {"status": "ok"}
-
-
-@app.post("/act")
-def act():
-    """Increment the counter."""
-    global _count
-    _count += 1
-    return {"count": _count}
 
 
 @app.post("/reset")
 def reset():
-    """Reset the counter to 0."""
-    global _count
-    _count = 0
-    return {"ok": True}
+    if DB_PATH.exists():
+        DB_PATH.unlink()
+    database.setup(str(DB_PATH))
+    logger.info("Database reset completed")
+    return {"status": "reset", "ok": True}
 
-
-@app.get("/state")
-def state():
-    """Get the current counter state."""
-    return {"count": _count}
-
+if __name__ == "__main__":
+    uvicorn.run("backend.app:app", host="0.0.0.0", port=8005, reload=False)

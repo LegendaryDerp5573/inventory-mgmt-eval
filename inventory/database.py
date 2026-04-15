@@ -41,3 +41,8 @@ def initialize_database(db_path: Optional[str] = None) -> None:
             """
         )
         conn.commit()
+
+
+def setup(db_path: Optional[str] = None) -> None:
+    """Compatibility alias for initializing the database."""
+    initialize_database(db_path)

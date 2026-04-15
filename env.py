@@ -1,4 +1,4 @@
-"""Blank Environment - A minimal counter-based environment for testing.
+"""Inventory Environment - A simple bug-fix workflow for inventory tasks.
 
 This demonstrates:
 - @env.tool() for agent-facing tools
@@ -6,8 +6,10 @@ This demonstrates:
 - @env.initialize and @env.shutdown for lifecycle hooks
 """
 
+import asyncio
 import logging
 import os
+from pathlib import Path
 import sys
 from typing import Any
 
@@ -30,30 +32,70 @@ logger = logging.getLogger(__name__)
 # Backend configuration
 BACKEND_PORT = os.getenv("BACKEND_PORT", "8005")
 BACKEND_URL = f"http://localhost:{BACKEND_PORT}"
+PROJECT_DIR = Path(__file__).resolve().parent
+TESTS_DIR = PROJECT_DIR / "tests"
 
 # HTTP client for backend communication
 http_client = httpx.AsyncClient(base_url=BACKEND_URL, timeout=10.0)
 
 # Create the environment
-env = Environment(name="blank")
+env = Environment(name="inventory")
 
 
 @env.tool()
-async def act() -> str:
-    """Increment the counter by 1."""
-    resp = await http_client.post("/act")
-    return f"Counter: {resp.json().get('count', 0)}"
+async def bash_tool(command: str) -> str:
+    """Run a shell command in the project directory."""
+    process = await asyncio.create_subprocess_shell(
+        command,
+        cwd=str(PROJECT_DIR),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    out_text = stdout.decode(errors="replace").strip()
+    err_text = stderr.decode(errors="replace").strip()
+
+    return (
+        f"exit_code={process.returncode}\n"
+        f"stdout:\n{out_text}\n\n"
+        f"stderr:\n{err_text}"
+    )
 
 
-@env.scenario("count-to")
-async def count_to(target: int = 10) -> Any:
-    """Count to a target number by calling act() repeatedly."""
-    await http_client.post("/reset")
+@env.tool()
+async def edit_tool(path: str, content: str | None = None) -> str:
+    """View a file when content is omitted, or overwrite it when provided."""
+    target = (PROJECT_DIR / path).resolve()
+    if PROJECT_DIR not in target.parents and target != PROJECT_DIR:
+        return "Error: path must be inside project directory."
 
-    answer = yield f"Call act() until the counter reaches {target}."
+    if content is None:
+        if not target.exists():
+            return f"Error: file not found: {target}"
+        if target.is_dir():
+            return f"Error: path is a directory: {target}"
+        return target.read_text(encoding="utf-8")
 
-    current = (await http_client.get("/state")).json().get("count", 0)
-    yield min(1.0, current / target) if target > 0 else 1.0
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+    return f"Wrote file: {target}"
+
+
+@env.scenario("fix-bug")
+async def fix_bug(task_description: str) -> Any:
+    """Run a bug-fix task and score based on pytest pass/fail."""
+    _ = yield task_description
+
+    process = await asyncio.create_subprocess_shell(
+        f'pytest "{TESTS_DIR}"',
+        cwd=str(PROJECT_DIR),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    logger.info("pytest stdout:\n%s", stdout.decode(errors="replace"))
+    logger.info("pytest stderr:\n%s", stderr.decode(errors="replace"))
+    yield 1.0 if process.returncode == 0 else 0.0
 
 
 @env.initialize
