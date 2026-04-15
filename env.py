@@ -1,3 +1,4 @@
+```python
 """Inventory Environment - A simple bug-fix workflow for inventory tasks.
 
 This demonstrates:
