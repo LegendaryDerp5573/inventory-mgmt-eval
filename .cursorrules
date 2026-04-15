@@ -1,0 +1,6 @@
+This is a Python inventory management system used as an AI evaluation environment on HUD RL platform.
+The codebase has intentional bugs injected for evaluation purposes on specific branches.
+Use Flask for API routes, SQLite for the database, and pytest for tests.
+Branch structure: baseline (buggy code), test (pytest files), golden (correct working code).
+When asked to inject a bug, make it subtle and realistic.
+When asked to write tests, make them binary pass/fail with no partial credit.
