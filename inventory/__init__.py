@@ -1,0 +1,1 @@
+"""Simple inventory management package."""
