@@ -1,32 +1,38 @@
-# Inventory Management Evaluation
+# Inventory Management Workflow Evaluation
 
-A HUD RL environment for evaluating **GPT OSS 120B** (and other models) on a **Flask + SQLite** inventory management codebase. Agents receive bug descriptions, edit code with shell and file tools, and are scored by whether **pytest** passes.
+A HUD RL environment for evaluating **GPT OSS 120B** as an agent that operates a **gym inventory management system**. This workflow uses tool-based business task execution and SQL state validation, not bug fixing.
 
 ## Project overview
 
-This project measures how well a model can **diagnose and fix real bugs** in a small but realistic Python service:
+This project evaluates how well an agent can complete real operational tasks in an inventory + member support workflow:
 
-- **Stack:** SQLite for persistence; **`inventory/`** holds a **Flask** HTTP API (`inventory/api.py`) plus pure-Python modules for business logic. A separate **FastAPI** app (`backend/app.py`) exposes **health** and **database reset** for the HUD harness (port **8005**).
-- **Goal:** Compare models on code-repair tasks with **binary rewards** (all tests pass → **1.0**, any failure → **0.0**).
+- **Domain:** Gym-style business inventory and member inquiry handling.
+- **Agent role:** Receive plain-English instructions, call backend tools, and update state correctly.
+- **Evaluation target:** End-to-end workflow correctness measured from database state after task completion.
 
 ## Environment description
 
-The codebase models a **gym-style retail** operation:
+The environment exposes nine agent tools backed by HTTP calls to `BACKEND_URL`:
 
-- **Inventory** — Track items (SKU, quantity, restock thresholds, availability), restock checks, in-stock rates, and simple audit-style reports (`inventory/inventory.py`, `inventory/database.py`).
-- **Members** — Staff or front-desk users with inquiry resolution stats (`inventory/members.py`).
+- `get_items`
+- `get_item`
+- `update_quantity`
+- `update_availability`
+- `check_restock`
+- `get_members`
+- `get_member`
+- `resolve_inquiry`
+- `get_audit`
 
-Eval tasks inject bugs into **`inventory/inventory.py`** and **`inventory/members.py`** (and optionally related wiring). The agent must restore behavior expected by the tests under **`tests/`**.
+The backend (`backend/app.py`) serves these routes and persists data in SQLite (`inventory/inventory.db`). The environment scenario in `env.py` prompts the agent and then validates final state using SQL checks.
 
 ## Branch structure
 
 | Branch | Role |
 |--------|------|
-| **`main`** / **`golden`** | Correct reference implementation; tests should pass. |
-| **`baseline`** | Buggy code for agent repair tasks. |
-| **`test`** | Pytest suite and fixtures (often mirrored or merged with `tests/` at repo root). |
-
-Use **golden** as the ground truth when authoring or validating tasks; ship **baseline** to agents for eval.
+| **`main`** / **`golden`** | Working workflow implementation used for this evaluation setup. |
+| **`baseline`** | Unused in this workflow-based approach. |
+| **`test`** | Unused in this workflow-based approach. |
 
 ## 1. Deploy to Platform
 
@@ -37,56 +43,71 @@ If you haven't already, connect this repo to hud.ai:
 3. Connect your GitHub repo  
 4. Your environment builds automatically on each push  
 
-Once deployed, your environment is accessible by its slug (e.g., `my-org/inventory-mgmt`).
+Once deployed, your environment is accessible by its slug (e.g., `my-org/inventory-workflow`).
 
 ## 2. Define tools and scenarios
 
-**Tools** are functions the agent can call. **`bash_tool`** runs a shell command in the project root; **`edit_tool`** reads a file (no `content`) or overwrites it (with `content`). Paths must stay inside the project directory.
-
-**Scenarios** define the evaluation lifecycle: prompt the agent, then score.
+**Tools** are HTTP wrappers to the inventory backend APIs:
 
 ```python
-from hud import Environment
-
-env = Environment(name="inventory")
+@env.tool()
+async def get_items() -> Any: ...
 
 @env.tool()
-async def bash_tool(command: str) -> str:
-    ...
+async def update_quantity(item_id: int, quantity: int) -> Any: ...
 
 @env.tool()
-async def edit_tool(path: str, content: str | None = None) -> str:
-    ...
-
-@env.scenario("fix-bug")
-async def fix_bug(task_description: str):
-    _ = yield task_description                    # Prompt → agent edits code
-    # After the agent responds, pytest runs on tests/
-    yield 1.0 if process.returncode == 0 else 0.0
+async def resolve_inquiry(member_id: int, resolved: bool) -> Any: ...
 ```
 
-The HTTP client still targets the FastAPI backend on **`BACKEND_PORT`** (default **8005**) for **`@env.initialize`** health checks; **reward** is **not** derived from backend state—it comes **only** from the **pytest** exit code.
+**Scenario** is `workflow`, which takes:
+
+- `instruction: str`
+- `checks: list[dict]` where each dict has:
+  - `query` (SQL string)
+  - `expected` (expected scalar result)
+
+```python
+@env.scenario("workflow")
+async def workflow(instruction: str, checks: Sequence[Mapping[str, Any]]):
+    _ = yield instruction
+    # run SQL checks against inventory/inventory.db
+    yield 1.0 if all_checks_pass else 0.0
+```
+
+### Scoring
+
+Scoring is **SQL-based**, not pytest-based:
+
+1. Agent completes the task using tools.
+2. Evaluator opens SQLite at `inventory/inventory.db`.
+3. Each check query is executed and compared to its `expected` value.
+4. Reward is **1.0** only if **all** checks pass, otherwise **0.0**.
 
 ### How tasks work
 
-1. The platform (or harness) passes a **`task_description`** (the bug report).  
-2. The scenario **yields** that string as the **prompt** to the agent.  
-3. The agent uses **`bash_tool`** and **`edit_tool`** to fix the code.  
-4. After the agent finishes, the scenario runs **`pytest`** on the **`tests/`** directory at the project root.  
-5. **Score:** **1.0** if pytest exits **0**, **0.0** otherwise.
-
-Between eval episodes, call **`POST /reset`** on the backend (or restart the backend) to wipe and reinitialize the SQLite DB so each run starts clean.
+1. The task provides a plain-English business instruction (for example, adjust stock and resolve a member inquiry).
+2. The scenario yields that instruction as the prompt.
+3. The agent calls one or more tools to perform the workflow.
+4. After the agent response, SQL checks verify final database state.
+5. Score is returned from those checks.
 
 ## 3. Create tasks from scenarios
 
-Tasks are scenario instances with specific arguments.
+Tasks are scenario instances with explicit instructions and SQL checks.
 
 **In code:**
 
 ```python
 tasks = [
-    env("fix-bug", task_description="Fix off-by-one in restock check when quantity equals threshold."),
-    env("fix-bug", task_description="Member resolution rate divides wrong when total_inquiries is zero."),
+    env(
+        "workflow",
+        instruction="Restock Hand Wraps to 12 and mark availability correctly.",
+        checks=[
+            {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 12},
+            {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        ],
+    ),
 ]
 ```
 
@@ -94,106 +115,100 @@ tasks = [
 
 ```json
 [
-  {"env": {"name": "my-org/inventory-mgmt"}, "scenario": "fix-bug", "args": {"task_description": "..."}}
+  {
+    "env": {"name": "my-org/inventory-workflow"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Resolve Dana Lee's inquiry as unresolved.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6}
+      ]
+    }
+  }
 ]
-```
-
-**On platform:**  
-After deploying, create tasks from your scenarios on hud.ai. Access them by slug:
-
-```python
-from hud.datasets import load_tasks
-tasks = load_tasks("my-org/inventory-mgmt-tasks")
 ```
 
 ## 4. Run evaluations
 
-Run tasks and see results on hud.ai. You have three options:
-
-**On platform:**  
-Run evaluations at scale directly on [hud.ai](https://hud.ai) with parallel execution and automatic tracing.
+Run tasks and see results on hud.ai.
 
 **CLI:**
 
 ```bash
-hud eval ./remote_tasks.json --model gpt-4o --remote  # https://hud.ai/models
-hud eval my-org/inventory-mgmt-tasks --model gpt-4o --remote --group 5
+hud eval ./remote_tasks.json --model gpt-4o --remote
+hud eval my-org/inventory-workflow-tasks --model gpt-4o --remote --group 5
 ```
 
 **Python:**
 
 ```python
 import hud
-from hud.agents import OpenAIChatAgent  # See all models: https://hud.ai/models
+from hud.agents import OpenAIChatAgent
 
-tasks = [env("fix-bug", task_description="...")]
+tasks = [env("workflow", instruction="...", checks=[...])]
 
 async with hud.eval(tasks) as ctx:
-    agent = OpenAIChatAgent.create(model="gpt-4o")  # Uses inference.hud.ai
-    await agent.run(ctx)
-
-# Results are automatically traced to hud.ai
-```
-
-**With variants (A/B testing):**
-
-```python
-async with hud.eval(tasks, variants={"model": ["gpt-4o-mini", "gpt-4o"]}, group=2) as ctx:
-    agent = OpenAIChatAgent.create(model=ctx.variants["model"])
+    agent = OpenAIChatAgent.create(model="gpt-4o")
     await agent.run(ctx)
 ```
 
 ## Task difficulty breakdown
 
-Bugs are categorized to span **`inventory/inventory.py`** and **`inventory/members.py`**:
-
-| Level | Examples |
-|-------|----------|
-| **Easy** | Wrong comparison (`<=` vs `<`), forgetting to update **`available`** when quantity changes, single-branch mistakes in **`check_restock`**. |
-| **Medium** | Incorrect **`get_instock_rate`** or **`run_audit_report`** aggregation; **`resolve_inquiry`** double-counting or not incrementing **`total_inquiries`**; edge cases around zero quantity. |
-| **Hard** | Subtle inconsistencies across DB reads/writes, wrong field used in a query, or logic that only fails under multi-step sequences (still covered by pytest). |
-
-Author tasks so each maps to one focused bug class and is fully specified in **`task_description`**.
+| Level | Description |
+|-------|-------------|
+| **Easy** | Single tool call with an obvious action (e.g., set one quantity). |
+| **Medium** | 2-3 steps; requires filtering records or light math before acting. |
+| **Hard** | Multi-step workflows with conditional logic and/or ambiguous phrasing. |
 
 ## Local development
 
 ```bash
-# Start the FastAPI backend (health + DB reset; initializes SQLite on startup)
+# Start backend (port 8005)
 uvicorn backend.app:app --port 8005 --reload
 
-# Optional: reset DB between manual runs (empty schema + tables recreated)
+# Reset and reseed database
 curl -X POST http://localhost:8005/reset
-
-# Run the test suite (same command used for scoring in fix-bug)
-pytest tests/
-
-# Optional: local HUD-style checks
-python local_test.py
-python remote_test.py
 ```
 
-The SQLite file is created under **`inventory/inventory.db`** when the backend starts (or when **`inventory.database.setup()`** runs). No separate seed script is required for an empty DB; use your tests or small scripts to insert rows if you need fixtures beyond **`tests/conftest.py`**.
+Available API routes:
+
+- `GET /health`
+- `POST /reset`
+- `GET /items`
+- `GET /items/{item_id}`
+- `PUT /items/{item_id}/quantity`
+- `PUT /items/{item_id}/available`
+- `GET /items/{item_id}/restock`
+- `GET /members`
+- `GET /members/{member_id}`
+- `PUT /members/{member_id}/resolve`
+- `GET /audit`
 
 ## Structure
 
 ```
 inventory-mgmt-env/
-├── env.py                 # Environment: bash_tool, edit_tool, fix-bug scenario
+├── env.py                 # HUD environment: workflow tools + SQL-scored scenario
 ├── backend/
-│   └── app.py             # FastAPI: /health, /reset, DB init (port 8005)
+│   ├── __init__.py
+│   └── app.py             # FastAPI backend (health/reset/items/members/audit)
 ├── inventory/
-│   ├── database.py        # SQLite setup (setup / initialize_database)
-│   ├── inventory.py       # Items: add/remove/update, restock, audit, rates
-│   ├── members.py         # Members: CRUD-ish, inquiries, resolution rate
-│   └── api.py             # Flask routes wrapping inventory + members
+│   ├── __init__.py
+│   ├── api.py             # Flask API module (inventory/member routes)
+│   ├── database.py        # SQLite connection + schema setup
+│   ├── inventory.py       # Inventory business logic + audit
+│   ├── members.py         # Member inquiry business logic
+│   └── seed.py            # Deterministic seed data for startup/reset
 ├── tests/
+│   ├── __init__.py
 │   ├── conftest.py
 │   └── test_backend.py
 ├── local_test.py
 ├── remote_test.py
 ├── remote_tasks.json
 ├── Dockerfile.hud
-└── pyproject.toml
+├── pyproject.toml
+└── README.md
 ```
 
 ## Documentation
