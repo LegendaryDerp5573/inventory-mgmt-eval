@@ -1,18 +1,17 @@
-```python
-"""Inventory Environment - A simple bug-fix workflow for inventory tasks.
+"""Inventory Environment - Workflow-based evaluation over HTTP + SQLite.
 
 This demonstrates:
-- @env.tool() for agent-facing tools
-- @env.scenario() for evaluation lifecycle (setup → prompt → evaluate)
+- @env.tool() for agent-facing tools (HTTP calls to backend)
+- @env.scenario() for evaluation lifecycle (prompt → agent runs → SQL checks)
 - @env.initialize and @env.shutdown for lifecycle hooks
 """
 
-import asyncio
 import logging
 import os
 from pathlib import Path
+import sqlite3
 import sys
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 import httpx
 
@@ -34,7 +33,7 @@ logger = logging.getLogger(__name__)
 BACKEND_PORT = os.getenv("BACKEND_PORT", "8005")
 BACKEND_URL = f"http://localhost:{BACKEND_PORT}"
 PROJECT_DIR = Path(__file__).resolve().parent
-TESTS_DIR = PROJECT_DIR / "tests"
+DB_PATH = PROJECT_DIR / "inventory" / "inventory.db"
 
 # HTTP client for backend communication
 http_client = httpx.AsyncClient(base_url=BACKEND_URL, timeout=10.0)
@@ -44,59 +43,93 @@ env = Environment(name="inventory")
 
 
 @env.tool()
-async def bash_tool(command: str) -> str:
-    """Run a shell command in the project directory."""
-    process = await asyncio.create_subprocess_shell(
-        command,
-        cwd=str(PROJECT_DIR),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    out_text = stdout.decode(errors="replace").strip()
-    err_text = stderr.decode(errors="replace").strip()
-
-    return (
-        f"exit_code={process.returncode}\n"
-        f"stdout:\n{out_text}\n\n"
-        f"stderr:\n{err_text}"
-    )
+async def get_items() -> Any:
+    resp = await http_client.get("/items")
+    resp.raise_for_status()
+    return resp.json()
 
 
 @env.tool()
-async def edit_tool(path: str, content: str | None = None) -> str:
-    """View a file when content is omitted, or overwrite it when provided."""
-    target = (PROJECT_DIR / path).resolve()
-    if PROJECT_DIR not in target.parents and target != PROJECT_DIR:
-        return "Error: path must be inside project directory."
-
-    if content is None:
-        if not target.exists():
-            return f"Error: file not found: {target}"
-        if target.is_dir():
-            return f"Error: path is a directory: {target}"
-        return target.read_text(encoding="utf-8")
-
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(content, encoding="utf-8")
-    return f"Wrote file: {target}"
+async def get_item(item_id: int) -> Any:
+    resp = await http_client.get(f"/items/{item_id}")
+    resp.raise_for_status()
+    return resp.json()
 
 
-@env.scenario("fix-bug")
-async def fix_bug(task_description: str) -> Any:
-    """Run a bug-fix task and score based on pytest pass/fail."""
-    _ = yield task_description
+@env.tool()
+async def update_quantity(item_id: int, quantity: int) -> Any:
+    resp = await http_client.put(f"/items/{item_id}/quantity", json={"quantity": quantity})
+    resp.raise_for_status()
+    return resp.json()
 
-    process = await asyncio.create_subprocess_shell(
-        f'pytest "{TESTS_DIR}"',
-        cwd=str(PROJECT_DIR),
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    logger.info("pytest stdout:\n%s", stdout.decode(errors="replace"))
-    logger.info("pytest stderr:\n%s", stderr.decode(errors="replace"))
-    yield 1.0 if process.returncode == 0 else 0.0
+
+@env.tool()
+async def update_availability(item_id: int, available: int) -> Any:
+    resp = await http_client.put(f"/items/{item_id}/available", json={"available": available})
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.tool()
+async def check_restock(item_id: int) -> Any:
+    resp = await http_client.get(f"/items/{item_id}/restock")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.tool()
+async def get_members() -> Any:
+    resp = await http_client.get("/members")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.tool()
+async def get_member(member_id: int) -> Any:
+    resp = await http_client.get(f"/members/{member_id}")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.tool()
+async def resolve_inquiry(member_id: int, resolved: bool) -> Any:
+    resp = await http_client.put(f"/members/{member_id}/resolve", json={"resolved": resolved})
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.tool()
+async def get_audit() -> Any:
+    resp = await http_client.get("/audit")
+    resp.raise_for_status()
+    return resp.json()
+
+
+@env.scenario("workflow")
+async def workflow(instruction: str, checks: Sequence[Mapping[str, Any]]) -> Any:
+    _ = yield instruction
+
+    conn = sqlite3.connect(str(DB_PATH))
+    try:
+        for i, check in enumerate(checks):
+            query = check["query"]
+            expected = check["expected"]
+            row = conn.execute(query).fetchone()
+            actual = row[0] if row is not None and len(row) > 0 else None
+            if actual != expected:
+                logger.info(
+                    "Check %s failed. query=%r expected=%r actual=%r",
+                    i,
+                    query,
+                    expected,
+                    actual,
+                )
+                yield 0.0
+                return
+    finally:
+        conn.close()
+
+    yield 1.0
 
 
 @env.initialize
