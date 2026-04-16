@@ -1,10 +1,10 @@
 [project]
-name = "hud-blank"
+name = "inventory-mgmt-eval"
 version = "0.1.0"
-description = "A minimal counter-based HUD environment for testing"
+description = "Inventory management workflow evaluation environment for GPT OSS 120B"
 requires-python = ">=3.11"
 dependencies = [
-    "hud-python==0.5.0",
+    "hud-python>=0.5.35",
     "fastapi>=0.100.0",
     "uvicorn>=0.20.0",
     "httpx>=0.24.0",
@@ -16,5 +16,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["backend"]
-
+packages = ["backend", "inventory"]
