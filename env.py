@@ -30,8 +30,7 @@ for logger_name in ["httpx", "httpcore"]:
 logger = logging.getLogger(__name__)
 
 # Backend configuration
-BACKEND_PORT = os.getenv("BACKEND_PORT", "8005")
-BACKEND_URL = f"http://localhost:{BACKEND_PORT}"
+BACKEND_URL = "http://localhost:8005"
 PROJECT_DIR = Path(__file__).resolve().parent
 DB_PATH = PROJECT_DIR / "inventory" / "inventory.db"
 
