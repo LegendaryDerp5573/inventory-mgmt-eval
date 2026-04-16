@@ -11,6 +11,7 @@ import uvicorn
 from inventory import database
 from inventory import inventory as inventory_service
 from inventory import members as members_service
+import inventory.seed as seed
 
 logging.basicConfig(
     stream=sys.stderr,
@@ -25,6 +26,7 @@ DB_PATH = Path(__file__).resolve().parent.parent / "inventory" / "inventory.db"
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     database.setup(str(DB_PATH))
+    seed.run(str(DB_PATH))
     yield
 
 
@@ -41,6 +43,7 @@ def reset():
     if DB_PATH.exists():
         DB_PATH.unlink()
     database.setup(str(DB_PATH))
+    seed.run(str(DB_PATH))
     logger.info("Database reset completed")
     return {"status": "reset", "ok": True}
 
