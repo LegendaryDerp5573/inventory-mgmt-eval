@@ -131,16 +131,6 @@ async def workflow(instruction: str, checks: Sequence[Mapping[str, Any]]) -> Any
     yield 1.0
 
 
-@env.initialize
-async def init() -> None:
-    """Check backend health on startup."""
-    try:
-        resp = await http_client.get("/health")
-        resp.raise_for_status()
-    except Exception as e:
-        logger.warning("Backend health check failed: %s", e)
-
-
 @env.shutdown
 async def cleanup() -> None:
     """Close HTTP client on shutdown."""
