@@ -1,17 +1,309 @@
 [
   {
-    "env": {"name": "my-org/blank"},
-    "scenario": "count-to",
-    "args": {"target": 3}
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Update the quantity of Boxing Gloves to 20.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 20}
+      ]
+    }
   },
   {
-    "env": {"name": "my-org/blank"},
-    "scenario": "count-to",
-    "args": {"target": 10}
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Mark Training Pads as unavailable.",
+      "checks": [
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0}
+      ]
+    }
   },
   {
-    "env": {"name": "my-org/blank"},
-    "scenario": "count-to",
-    "args": {"target": 5}
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Alice Johnson just resolved an inquiry successfully. Update her record.",
+      "checks": [
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A customer reported an issue with their account. Log an unresolved inquiry for Bob Smith.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Restock Hand Wraps to 15 units and make sure availability is correct.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 15},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Training Pads are out of stock. Make sure both the quantity and availability reflect this correctly.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Carlos Rivera just had an inquiry that was successfully resolved. Update his record to reflect both the new inquiry and its resolution.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Find the item with the lowest current stock and restock it to exactly double its threshold.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A shipment arrived with 10 units of Jump Rope. Add them to the existing stock and update availability accordingly.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 12},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Find all items that are currently marked unavailable and set their quantity to 0 to make the records consistent.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 0},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "The member with the most unresolved inquiries needs their record updated with one more unresolved inquiry.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 0}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Bring all items that are below their restock threshold up to exactly their threshold quantity and update availability.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 5},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them.",
+      "checks": [
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A new shipment arrived. Add 5 units to every item that is currently marked unavailable and update their availability status.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 8},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 7},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 5},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Evan Park contacted us with two new inquiries today — one was resolved and one was not. Update his record.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 47},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Check which items need restocking and update all of them to double their threshold quantity. Make sure availability is correct for each.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 20},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 10},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Find the item with the highest quantity in stock and reduce it by half. Round down if needed.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 10}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "We are doing a temporary closure. Mark every item that is at or below its restock threshold as unavailable, but leave everything else as is.",
+      "checks": [
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU004'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU001'", "expected": 1},
+        {"query": "SELECT available FROM items WHERE sku='SKU003'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A staff audit found that all members with a resolution rate below 50% need to have one additional unresolved inquiry logged against their record.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='bob@gym.com'", "expected": 15},
+        {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 0}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "The gym is restocking for a busy season. For every item currently below threshold, add enough units to bring it to triple its threshold. Update availability for each.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 30},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 15},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 15},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "End of day report: log one resolved inquiry for every member who currently has a resolution rate above 90%.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29},
+        {"query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A large order just came in and wiped out our most popular items. Set Boxing Gloves to 2 units, Mouth Guard to 3 units, and Headgear to 1 unit. Make sure availability is accurate for all three.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 2},
+        {"query": "SELECT available FROM items WHERE sku='SKU001'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 3},
+        {"query": "SELECT available FROM items WHERE sku='SKU003'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU006'", "expected": 1},
+        {"query": "SELECT available FROM items WHERE sku='SKU006'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "A disgruntled customer filed complaints with every staff member today. Each complaint was unresolved. Log one unresolved inquiry for every member on record.",
+      "checks": [
+        {"query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31},
+        {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21},
+        {"query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11},
+        {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6},
+        {"query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 46}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "Do a full inventory reset for low stock items: any item with quantity below 5 should be set to 0 and marked unavailable. Any item with quantity between 5 and its threshold should be brought up to its threshold and marked available.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 0},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 0},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 0},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU004'", "expected": 10},
+        {"query": "SELECT available FROM items WHERE sku='SKU004'", "expected": 1}
+      ]
+    }
+  },
+  {
+    "env": {"name": "inventory"},
+    "scenario": "workflow",
+    "args": {
+      "instruction": "The gym owner wants a full operational reset before opening tomorrow. Bring every item that needs restocking up to exactly its threshold. Mark everything with zero quantity as unavailable. Log one resolved inquiry for the member with the lowest resolution rate.",
+      "checks": [
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10},
+        {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+        {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 5},
+        {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1},
+        {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0},
+        {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6},
+        {"query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 1}
+      ]
+    }
   }
 ]
