@@ -39,6 +39,7 @@ _ = (add_item, get_instock_rate, get_resolution_rate)
 
 @env.tool()
 def get_items() -> list[dict[str, Any]]:
+    """Get all items in the inventory ordered by id."""
     initialize_database(str(DB_PATH))
     with get_connection(str(DB_PATH)) as conn:
         rows = conn.execute("SELECT * FROM items ORDER BY id").fetchall()
@@ -47,6 +48,7 @@ def get_items() -> list[dict[str, Any]]:
 
 @env.tool()
 def get_item(item_id: int) -> dict[str, Any]:
+    """Get a single inventory item by its id."""
     initialize_database(str(DB_PATH))
     with get_connection(str(DB_PATH)) as conn:
         row = conn.execute("SELECT * FROM items WHERE id = ?", (item_id,)).fetchone()
@@ -55,6 +57,7 @@ def get_item(item_id: int) -> dict[str, Any]:
 
 @env.tool()
 def update_item_quantity(item_id: int, quantity: int) -> dict[str, Any]:
+    """Update the quantity of an inventory item. Also updates availability based on quantity."""
     initialize_database(str(DB_PATH))
     item = update_quantity(item_id=item_id, quantity=quantity, db_path=str(DB_PATH))
     return item if item is not None else {}
@@ -62,6 +65,7 @@ def update_item_quantity(item_id: int, quantity: int) -> dict[str, Any]:
 
 @env.tool()
 def update_item_availability(item_id: int, available: int) -> dict[str, Any]:
+    """Update the availability status of an inventory item. Use 1 for available, 0 for unavailable."""
     initialize_database(str(DB_PATH))
     with get_connection(str(DB_PATH)) as conn:
         conn.execute("UPDATE items SET available = ? WHERE id = ?", (available, item_id))
@@ -72,12 +76,14 @@ def update_item_availability(item_id: int, available: int) -> dict[str, Any]:
 
 @env.tool()
 def check_item_restock(item_id: int) -> dict[str, Any]:
+    """Check if an inventory item needs restocking based on its threshold."""
     initialize_database(str(DB_PATH))
     return check_restock(item_id=item_id, db_path=str(DB_PATH))
 
 
 @env.tool()
 def get_members() -> list[dict[str, Any]]:
+    """Get all members ordered by id."""
     initialize_database(str(DB_PATH))
     with get_connection(str(DB_PATH)) as conn:
         rows = conn.execute("SELECT * FROM members ORDER BY id").fetchall()
@@ -86,6 +92,7 @@ def get_members() -> list[dict[str, Any]]:
 
 @env.tool()
 def get_member_by_id(member_id: int) -> dict[str, Any]:
+    """Get a single member by their id."""
     initialize_database(str(DB_PATH))
     member = get_member(member_id=member_id, db_path=str(DB_PATH))
     return member if member is not None else {}
@@ -93,6 +100,7 @@ def get_member_by_id(member_id: int) -> dict[str, Any]:
 
 @env.tool()
 def resolve_member_inquiry(member_id: int, resolved: bool) -> dict[str, Any]:
+    """Log an inquiry for a member. Set resolved=True if the inquiry was resolved, False if not."""
     initialize_database(str(DB_PATH))
     member = resolve_inquiry(member_id=member_id, resolved=resolved, db_path=str(DB_PATH))
     return member if member is not None else {}
@@ -100,6 +108,7 @@ def resolve_member_inquiry(member_id: int, resolved: bool) -> dict[str, Any]:
 
 @env.tool()
 def get_audit_report() -> dict[str, Any]:
+    """Get a full audit report of the current inventory state."""
     initialize_database(str(DB_PATH))
     return run_audit_report(db_path=str(DB_PATH))
 
