@@ -1,365 +1,231 @@
 [
   {
     "slug": "task-01",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Update the quantity of Boxing Gloves to 20.",
+      "instruction": "A coach just returned a set of Boxing Gloves. We now have 20 on the shelf. Update the inventory — but only if this change actually brings us above the restock threshold.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU001'",
-          "expected": 20
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 20 },
+        { "query": "SELECT available FROM items WHERE sku='SKU001'", "expected": 1 }
       ]
     }
   },
   {
     "slug": "task-02",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Mark Training Pads as unavailable.",
+      "instruction": "Training Pads are being pulled from the floor for inspection. Mark them unavailable, but only update availability — do not change the quantity.",
       "checks": [
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 0
-        }
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0 }
       ]
     }
   },
   {
     "slug": "task-03",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Alice Johnson just resolved an inquiry successfully. Update her record.",
+      "instruction": "Alice Johnson just closed out a support ticket successfully. Her total interaction count should already include this ticket — just mark it as resolved.",
       "checks": [
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'",
-          "expected": 29
-        }
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29 },
+        { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 30 }
       ]
     }
   },
   {
     "slug": "task-04",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A customer reported an issue with their account. Log an unresolved inquiry for Bob Smith.",
+      "instruction": "Bob Smith called in with a billing complaint that we couldn't resolve today. Log the interaction — it was not resolved.",
       "checks": [
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'",
-          "expected": 21
-        }
+        { "query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21 },
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='bob@gym.com'", "expected": 15 }
       ]
     }
   },
   {
     "slug": "task-05",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Restock Hand Wraps to 15 units and make sure availability is correct.",
+      "instruction": "A new shipment of 12 Hand Wraps just arrived and was logged into the system. We already had some in stock. Set the total quantity to 15 and make sure the item shows as available.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 15
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU002'",
-          "expected": 1
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 15 },
+        { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 }
       ]
     }
   },
   {
     "slug": "task-06",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
-    "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Training Pads are out of stock. Make sure both the quantity and availability reflect this correctly.",
+      "instruction": "We're doing a data cleanup pass. For any item that is currently marked unavailable, zero out its quantity to make the records consistent. Leave all available items untouched.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 0
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 0
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0 },
+        { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 0 },
+        { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0 },
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 }
       ]
     }
   },
   {
     "slug": "task-07",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Carlos Rivera just had an inquiry that was successfully resolved. Update his record to reflect both the new inquiry and its resolution.",
+      "instruction": "Carlos Rivera contacted us with a question that our team resolved on the spot. Record the full interaction — it was a new inquiry and it was successfully resolved.",
       "checks": [
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'",
-          "expected": 11
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'",
-          "expected": 10
-        }
+        { "query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11 },
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10 }
       ]
     }
   },
   {
     "slug": "task-08",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Find the item with the lowest current stock and restock it to exactly double its threshold.",
+      "instruction": "We're prioritizing restocking for the item in the worst shape. Find whichever item currently has the lowest quantity in stock and bring it up to exactly double its own restock threshold. Update availability accordingly.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 10
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10 },
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1 }
       ]
     }
   },
   {
     "slug": "task-09",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A shipment arrived with 10 units of Jump Rope. Add them to the existing stock and update availability accordingly.",
+      "instruction": "A delivery of 10 Jump Ropes arrived this afternoon. Add them to whatever we already have on hand and update the availability flag based on the new total.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU005'",
-          "expected": 12
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU005'",
-          "expected": 1
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 12 },
+        { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1 }
       ]
     }
   },
   {
     "slug": "task-10",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Find all items that are currently marked unavailable and set their quantity to 0 to make the records consistent.",
+      "instruction": "Audit sweep: every item that is currently marked unavailable has a stale quantity figure. Set their quantity to 0. Do not touch any items that are currently available.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 0
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU005'",
-          "expected": 0
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 0
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 20 }
       ]
     }
   },
   {
     "slug": "task-11",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "The member with the most unresolved inquiries needs their record updated with one more unresolved inquiry.",
+      "instruction": "A recurring complaint came in and was not resolved. Log it against the staff member whose record currently has the most unresolved inquiries — that's total minus resolved. Only update that one member.",
       "checks": [
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'",
-          "expected": 9
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'",
-          "expected": 0
-        }
+        { "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 9 },
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 0 }
       ]
     }
   },
   {
     "slug": "task-12",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
-    "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Bring all items that are below their restock threshold up to exactly their threshold quantity and update availability.",
+      "instruction": "Before opening tomorrow, bring every item whose current quantity is strictly below its restock threshold up to exactly that threshold. Mark each one available. Do not modify items that are already at or above threshold.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 10
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU002'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 5
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 1
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10 },
+        { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU004'", "expected": 10 },
+        { "query": "SELECT available FROM items WHERE sku='SKU004'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 5 },
+        { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 5 },
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 20 }
       ]
     }
-  },
+  },  
   {
     "slug": "task-13",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them. If there is a tie, update all tied members.",
+      "instruction": "End-of-day recognition: find the member(s) with the highest resolution rate (inquiries_resolved ÷ total_inquiries). If multiple members tie, update all of them. For each, log one additional successfully resolved inquiry — meaning both their total and resolved counts go up by one.",
       "checks": [
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 46
-        }
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29 },
+        { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31 },
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43 },
+        { "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 46 }
       ]
     }
   },
   {
     "slug": "task-14",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A new shipment arrived. Add 5 units to every item that is currently marked unavailable and update their availability status.",
+      "instruction": "A small top-up shipment arrived with 5 units each of only the items currently out of circulation (marked unavailable). Add 5 to each of those items' quantities and flip their availability to available. Items already available should not be touched.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 8
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU002'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU005'",
-          "expected": 7
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU005'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 5
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 1
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 8 },
+        { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 7 },
+        { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 5 },
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 }
       ]
     }
   },
   {
     "slug": "task-15",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Evan Park contacted us with two new inquiries today \u2014 one was resolved and one was not. Update his record.",
+      "instruction": "Evan Park reached out twice today. The first call was resolved, the second was not. Update his record to reflect both interactions accurately.",
       "checks": [
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'",
-          "expected": 47
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'",
-          "expected": 43
-        }
+        { "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 47 },
+        { "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43 }
       ]
     }
   },
   {
     "slug": "task-16",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
-    "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Check which items need restocking and update all of them to double their threshold quantity. Make sure availability is correct for each.",
+      "instruction": "Major restock day. Identify every item currently below its restock threshold and set each one's quantity to exactly double its own threshold. Mark all of them available. Items at or above threshold stay exactly as they are.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 20
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU002'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU005'",
-          "expected": 10
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU005'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU007'",
-          "expected": 10
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 1
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 20 },
+        { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU004'", "expected": 20 },
+        { "query": "SELECT available FROM items WHERE sku='SKU004'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 10 },
+        { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10 },
+        { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 20 }
       ]
     }
   },
   {
     "slug": "task-17",
-    "env": {
-      "name": "inventory-mgmt-env"
-    },
+    "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Find the item with the highest quantity in stock and reduce it by half. Round down if needed.",
+      "instruction": "We're redistributing overstock. Find the single item with the highest quantity currently in stock. Reduce its quantity by half, rounding down if needed. Do not change any other items.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU003'",
-          "expected": 10
-        }
+        { "query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 10 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 },
+        { "query": "SELECT quantity FROM items WHERE sku='SKU004'", "expected": 8 }
       ]
     }
   },
