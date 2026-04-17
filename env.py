@@ -8,6 +8,7 @@ from typing import Any, Mapping, Sequence
 
 from hud import Environment
 from inventory.database import get_connection, initialize_database
+from inventory.seed import run as seed_db
 from inventory.inventory import (
     add_item, update_quantity, check_restock,
     get_instock_rate, run_audit_report,
@@ -115,6 +116,8 @@ def get_audit_report() -> dict[str, Any]:
 
 @env.scenario("workflow")
 async def workflow(instruction: str, checks: Sequence[Mapping[str, Any]]) -> Any:
+    initialize_database(str(DB_PATH))
+    seed_db(str(DB_PATH))
     _ = yield instruction
 
     conn = sqlite3.connect(str(DB_PATH))
