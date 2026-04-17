@@ -31,7 +31,7 @@ PROJECT_DIR = Path(__file__).resolve().parent
 DB_PATH = PROJECT_DIR / "inventory" / "inventory.db"
 
 # Create the environment
-env = Environment(name="inventory")
+env = Environment(name="inventory-mgmt-env")
 env.connect_fastapi(fastapi_app)
 
 
