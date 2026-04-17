@@ -3,6 +3,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-01",
       "instruction": "Update the quantity of Boxing Gloves to 20.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 20}
@@ -13,6 +14,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-02",
       "instruction": "Mark Training Pads as unavailable.",
       "checks": [
         {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0}
@@ -23,6 +25,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-03",
       "instruction": "Alice Johnson just resolved an inquiry successfully. Update her record.",
       "checks": [
         {"query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29}
@@ -33,6 +36,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-04",
       "instruction": "A customer reported an issue with their account. Log an unresolved inquiry for Bob Smith.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21}
@@ -43,6 +47,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-05",
       "instruction": "Restock Hand Wraps to 15 units and make sure availability is correct.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 15},
@@ -54,6 +59,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-06",
       "instruction": "Training Pads are out of stock. Make sure both the quantity and availability reflect this correctly.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0},
@@ -65,6 +71,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-07",
       "instruction": "Carlos Rivera just had an inquiry that was successfully resolved. Update his record to reflect both the new inquiry and its resolution.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11},
@@ -76,6 +83,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-08",
       "instruction": "Find the item with the lowest current stock and restock it to exactly double its threshold.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10}
@@ -86,6 +94,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-09",
       "instruction": "A shipment arrived with 10 units of Jump Rope. Add them to the existing stock and update availability accordingly.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 12},
@@ -97,6 +106,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-10",
       "instruction": "Find all items that are currently marked unavailable and set their quantity to 0 to make the records consistent.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0},
@@ -109,6 +119,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-11",
       "instruction": "The member with the most unresolved inquiries needs their record updated with one more unresolved inquiry.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 6},
@@ -120,6 +131,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-12",
       "instruction": "Bring all items that are below their restock threshold up to exactly their threshold quantity and update availability.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10},
@@ -133,6 +145,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-13",
       "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them.",
       "checks": [
         {"query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10}
@@ -143,6 +156,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-14",
       "instruction": "A new shipment arrived. Add 5 units to every item that is currently marked unavailable and update their availability status.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 8},
@@ -158,6 +172,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-15",
       "instruction": "Evan Park contacted us with two new inquiries today — one was resolved and one was not. Update his record.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 47},
@@ -169,6 +184,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-16",
       "instruction": "Check which items need restocking and update all of them to double their threshold quantity. Make sure availability is correct for each.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 20},
@@ -184,6 +200,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-17",
       "instruction": "Find the item with the highest quantity in stock and reduce it by half. Round down if needed.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 10}
@@ -194,6 +211,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-18",
       "instruction": "We are doing a temporary closure. Mark every item that is at or below its restock threshold as unavailable, but leave everything else as is.",
       "checks": [
         {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 0},
@@ -209,6 +227,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-19",
       "instruction": "A staff audit found that all members with a resolution rate below 50% need to have one additional unresolved inquiry logged against their record.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21},
@@ -222,6 +241,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-20",
       "instruction": "The gym is restocking for a busy season. For every item currently below threshold, add enough units to bring it to triple its threshold. Update availability for each.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 30},
@@ -237,6 +257,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-21",
       "instruction": "End of day report: log one resolved inquiry for every member who currently has a resolution rate above 90%.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31},
@@ -250,6 +271,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-22",
       "instruction": "A large order just came in and wiped out our most popular items. Set Boxing Gloves to 2 units, Mouth Guard to 3 units, and Headgear to 1 unit. Make sure availability is accurate for all three.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 2},
@@ -265,6 +287,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-23",
       "instruction": "A disgruntled customer filed complaints with every staff member today. Each complaint was unresolved. Log one unresolved inquiry for every member on record.",
       "checks": [
         {"query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31},
@@ -279,6 +302,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-24",
       "instruction": "Do a full inventory reset for low stock items: any item with quantity below 5 should be set to 0 and marked unavailable. Any item with quantity between 5 and its threshold should be brought up to its threshold and marked available.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0},
@@ -294,6 +318,7 @@
     "env": {"name": "inventory"},
     "scenario": "workflow",
     "args": {
+      "slug": "task-25",
       "instruction": "The gym owner wants a full operational reset before opening tomorrow. Bring every item that needs restocking up to exactly its threshold. Mark everything with zero quantity as unavailable. Log one resolved inquiry for the member with the lowest resolution rate.",
       "checks": [
         {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10},
