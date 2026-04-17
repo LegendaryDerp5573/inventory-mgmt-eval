@@ -28,10 +28,10 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Alice Johnson just closed out a support ticket successfully. Her total interaction count should already include this ticket — just mark it as resolved.",
+      "instruction": "Alice Johnson just resolved a member inquiry. Log it and mark it as resolved.",
       "checks": [
         { "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29 },
-        { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 30 }
+        { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31 }
       ]
     }
   },
