@@ -194,7 +194,7 @@
       "checks": [
         {
           "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'",
-          "expected": 6
+          "expected": 9
         },
         {
           "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'",
@@ -238,11 +238,19 @@
     },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them.",
+      "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them. If there is a tie, update all tied members.",
       "checks": [
         {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'",
-          "expected": 10
+          "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29
+        },
+        {
+          "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31
+        },
+        {
+          "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43
+        },
+        {
+          "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 46
         }
       ]
     }
@@ -401,16 +409,8 @@
       "instruction": "A staff audit found that all members with a resolution rate below 50% need to have one additional unresolved inquiry logged against their record.",
       "checks": [
         {
-          "query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'",
-          "expected": 21
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='bob@gym.com'",
-          "expected": 15
-        },
-        {
           "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'",
-          "expected": 6
+          "expected": 9
         },
         {
           "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'",
@@ -462,7 +462,7 @@
     },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "End of day report: log one resolved inquiry for every member who currently has a resolution rate above 90%.",
+      "instruction": "End of day report: log one resolved inquiry for every member who currently has a resolution rate strictly above 90%.",
       "checks": [
         {
           "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'",
@@ -473,12 +473,12 @@
           "expected": 29
         },
         {
-          "query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'",
-          "expected": 11
+          "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'",
+          "expected": 46
         },
         {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'",
-          "expected": 10
+          "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'",
+          "expected": 43
         }
       ]
     }
@@ -490,7 +490,7 @@
     },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A large order just came in and wiped out our most popular items. Set Boxing Gloves to 2 units, Mouth Guard to 3 units, and Headgear to 1 unit. Make sure availability is accurate for all three.",
+      "instruction": "A large order just came in and wiped out our most popular items. Set Boxing Gloves to 2 units, Mouth Guard to 3 units, and Headgear to 1 unit. These items are still in stock so keep them marked as available.",
       "checks": [
         {
           "query": "SELECT quantity FROM items WHERE sku='SKU001'",
@@ -528,26 +528,16 @@
     "args": {
       "instruction": "A disgruntled customer filed complaints with every staff member today. Each complaint was unresolved. Log one unresolved inquiry for every member on record.",
       "checks": [
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'",
-          "expected": 31
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'",
-          "expected": 21
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'",
-          "expected": 11
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'",
-          "expected": 6
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'",
-          "expected": 46
-        }
+      {"query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 28},
+      {"query": "SELECT total_inquiries FROM members WHERE email='bob@gym.com'", "expected": 21},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='bob@gym.com'", "expected": 15},
+      {"query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 9},
+      {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 9},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 0},
+      {"query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 46},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 42}
       ]
     }
   },
@@ -594,36 +584,18 @@
     },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "The gym owner wants a full operational reset before opening tomorrow. Bring every item that needs restocking up to exactly its threshold. Mark everything with zero quantity as unavailable. Log one resolved inquiry for the member with the lowest resolution rate.",
+      "instruction": "The gym owner wants a full operational reset before opening tomorrow. Do the following: Bring every item that is below its restock threshold up to exactly its threshold quantity and mark it available. Then log one resolved inquiry for the member with the lowest resolution rate.",
       "checks": [
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU002'",
-          "expected": 10
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU002'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT quantity FROM items WHERE sku='SKU005'",
-          "expected": 5
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU005'",
-          "expected": 1
-        },
-        {
-          "query": "SELECT available FROM items WHERE sku='SKU007'",
-          "expected": 0
-        },
-        {
-          "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'",
-          "expected": 6
-        },
-        {
-          "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'",
-          "expected": 1
-        }
+        {"query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10},
+      {"query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1},
+      {"query": "SELECT quantity FROM items WHERE sku='SKU004'", "expected": 10},
+      {"query": "SELECT available FROM items WHERE sku='SKU004'", "expected": 1},
+      {"query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 5},
+      {"query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1},
+      {"query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 5},
+      {"query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1},
+      {"query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 9},
+      {"query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 1}
       ]
     }
   }

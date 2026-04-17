@@ -19,7 +19,7 @@ MEMBERS_ROWS = [
     ("Alice Johnson", "alice@gym.com", 28, 30),
     ("Bob Smith", "bob@gym.com", 15, 20),
     ("Carlos Rivera", "carlos@gym.com", 9, 10),
-    ("Dana Lee", "dana@gym.com", 0, 5),
+    ("Dana Lee", "dana@gym.com", 0, 8),
     ("Evan Park", "evan@gym.com", 42, 45),
 ]
 
