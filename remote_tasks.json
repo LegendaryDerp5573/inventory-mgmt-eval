@@ -4,7 +4,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A coach just returned a set of Boxing Gloves. We now have 20 on the shelf. Update the inventory — but only if this change actually brings us above the restock threshold.",
+      "instruction": "A coach dropped off some gear at the front desk. 20 Boxing Gloves are back on the shelf. Handle it.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 20 },
         { "query": "SELECT available FROM items WHERE sku='SKU001'", "expected": 1 }
@@ -16,7 +16,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Training Pads are being pulled from the floor for inspection. Mark them unavailable.",
+      "instruction": "Training Pads are being pulled from the floor for inspection. They're not available for use, but are physically here. Update accordingly.",
       "checks": [
         { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 0 },
         { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 0 }
@@ -28,7 +28,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Alice Johnson just resolved a member inquiry. Log it into the database.",
+      "instruction": "Alice Johnson just resolved a member inquiry. Record it.",
       "checks": [
         { "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29 },
         { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31 }
@@ -52,7 +52,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A new shipment of 12 Hand Wraps just arrived and was logged into the system. Update the total quantity and make sure the item shows as available.",
+      "instruction": "A new shipment of 12 Hand Wraps just arrived and was logged into the system. Update the inventory.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 15 },
         { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 }
@@ -64,7 +64,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "We're doing a data cleanup pass. For any item that is currently marked unavailable, zero out its quantity to make the records consistent. Leave all available items untouched.",
+      "instruction": "We're doing a data cleanup pass. Any item that is currently marked unavailable, make the stock zero to make it consistent.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0 },
         { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 0 },
@@ -81,7 +81,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Carlos Rivera contacted us with a question that our team resolved on the spot. Record the full interaction — it was a new inquiry and it was successfully resolved.",
+      "instruction": "Carlos Rivera contacted us with a question that our team resolved on the spot. Record the full interaction.",
       "checks": [
         { "query": "SELECT total_inquiries FROM members WHERE email='carlos@gym.com'", "expected": 11 },
         { "query": "SELECT inquiries_resolved FROM members WHERE email='carlos@gym.com'", "expected": 10 }
@@ -93,7 +93,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "We're prioritizing restocking for the item in the worst shape. Find whichever item currently has the lowest quantity in stock and bring it up to exactly double its own restock threshold. Update availability accordingly.",
+      "instruction": "We're prioritizing restocking for the item in the worst shape. Bring that item's stock up to double its restock threshold, and update accordingly.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU007'", "expected": 10 },
         { "query": "SELECT available FROM items WHERE sku='SKU007'", "expected": 1 }
@@ -105,7 +105,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A delivery of 10 Jump Ropes arrived this afternoon. Add them to whatever we already have on hand and update the availability flag based on the new total.",
+      "instruction": "A delivery of 10 Jump Ropes arrived this afternoon. Update the inventory accordingly.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 12 },
         { "query": "SELECT available FROM items WHERE sku='SKU005'", "expected": 1 }
@@ -117,7 +117,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Audit sweep: every item that is currently marked unavailable has a stale quantity figure. Set their quantity to 0. Do not touch any items that are currently available.",
+      "instruction": "Audit sweep: every item that is currently marked unavailable has a stale quantity figure. Set their quantity to 0.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 0 },
         { "query": "SELECT quantity FROM items WHERE sku='SKU005'", "expected": 0 },
@@ -132,7 +132,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A recurring complaint came in and was not resolved. Log it against the staff member whose record currently has the most unresolved inquiries.",
+      "instruction": "A recurring complaint came in and was not resolved. Log it against the staff member whose record currently has the lowest resolution rate.",
       "checks": [
         { "query": "SELECT total_inquiries FROM members WHERE email='dana@gym.com'", "expected": 9 },
         { "query": "SELECT inquiries_resolved FROM members WHERE email='dana@gym.com'", "expected": 0 }
@@ -144,7 +144,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Before opening tomorrow, bring every item whose current quantity is strictly below its restock threshold up to exactly that threshold. Mark each one available.",
+      "instruction": "Before opening tomorrow, bring every item whose current quantity is strictly below its restock threshold up to exactly that threshold. Update their availability accordingly.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 10 },
         { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
@@ -164,7 +164,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "End-of-day recognition: find the member(s) with the highest resolution rate. If multiple members tie, update all of them. For each, log one additional successfully resolved inquiry.",
+      "instruction": "End-of-day recognition: find the member(s) with the highest resolution rate, and log an additional resolved inquiry. If multiple members tie, update all of them.",
       "checks": [
         { "query": "SELECT inquiries_resolved FROM members WHERE email='alice@gym.com'", "expected": 29 },
         { "query": "SELECT total_inquiries FROM members WHERE email='alice@gym.com'", "expected": 31 },
@@ -178,7 +178,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "A small top-up shipment arrived with 5 units each of only the items currently out of circulation. Add 5 to each of those items' quantities and flip their availability to available.",
+      "instruction": "A small top-up shipment arrived with 5 units each of only the items currently out of circulation. Update the inventory and availability accordingly.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 8 },
         { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
@@ -195,7 +195,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Evan Park reached out twice today. The first call was resolved, the second was not. Update his inquiry record.",
+      "instruction": "Evan Park reached out twice today. The first call was resolved, the second was not. Update his record.",
       "checks": [
         { "query": "SELECT total_inquiries FROM members WHERE email='evan@gym.com'", "expected": 47 },
         { "query": "SELECT inquiries_resolved FROM members WHERE email='evan@gym.com'", "expected": 43 }
@@ -207,7 +207,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "Major restock day. Identify every item currently below its restock threshold and set each one's quantity to exactly double its own threshold. Mark all of them available.",
+      "instruction": "Major restock day. Identify every item currently below its restock threshold and set their quantity to double its restock threshold. Also update their availability accordingly.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU002'", "expected": 20 },
         { "query": "SELECT available FROM items WHERE sku='SKU002'", "expected": 1 },
@@ -227,7 +227,7 @@
     "env": { "name": "inventory-mgmt-env" },
     "scenario": "inventory-mgmt-env:workflow",
     "args": {
-      "instruction": "We're redistributing overstock. Find the single item with the highest quantity currently in stock. Reduce its quantity by half, rounding down if needed.",
+      "instruction": "We're redistributing overstock. Reduce that item's stock by half, rounding down if needed. If multiple items tie, reduce all of them by half.",
       "checks": [
         { "query": "SELECT quantity FROM items WHERE sku='SKU003'", "expected": 10 },
         { "query": "SELECT quantity FROM items WHERE sku='SKU001'", "expected": 15 },
