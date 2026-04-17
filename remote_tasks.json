@@ -61,6 +61,8 @@
   },
   {
     "slug": "task-06",
+    "env": { "name": "inventory-mgmt-env" },
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "We're doing a data cleanup pass. For any item that is currently marked unavailable, zero out its quantity to make the records consistent. Leave all available items untouched.",
       "checks": [
@@ -139,6 +141,8 @@
   },
   {
     "slug": "task-12",
+    "env": { "name": "inventory-mgmt-env" },
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Before opening tomorrow, bring every item whose current quantity is strictly below its restock threshold up to exactly that threshold. Mark each one available. Do not modify items that are already at or above threshold.",
       "checks": [
@@ -200,6 +204,8 @@
   },
   {
     "slug": "task-16",
+    "env": { "name": "inventory-mgmt-env" },
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Major restock day. Identify every item currently below its restock threshold and set each one's quantity to exactly double its own threshold. Mark all of them available. Items at or above threshold stay exactly as they are.",
       "checks": [
