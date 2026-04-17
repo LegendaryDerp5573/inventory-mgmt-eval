@@ -34,12 +34,12 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Inventory Management Backend", lifespan=lifespan)
 
 
-@app.get("/health")
+@app.get("/health", operation_id="health_check")
 def health():
     return {"status": "ok"}
 
 
-@app.post("/reset")
+@app.post("/reset", operation_id="reset_database")
 def reset():
     if DB_PATH.exists():
         DB_PATH.unlink()
@@ -53,14 +53,14 @@ def _row_to_dict(row: Any) -> dict[str, Any] | None:
     return dict(row) if row is not None else None
 
 
-@app.get("/items")
+@app.get("/items", operation_id="get_items")
 def get_items():
     with database.get_connection(str(DB_PATH)) as conn:
         rows = conn.execute("SELECT * FROM items ORDER BY id").fetchall()
     return [_row_to_dict(row) for row in rows]
 
 
-@app.get("/items/{item_id}")
+@app.get("/items/{item_id}", operation_id="get_item")
 def get_item(item_id: int):
     with database.get_connection(str(DB_PATH)) as conn:
         row = conn.execute("SELECT * FROM items WHERE id = ?", (item_id,)).fetchone()
@@ -70,7 +70,7 @@ def get_item(item_id: int):
     return item
 
 
-@app.put("/items/{item_id}/quantity")
+@app.put("/items/{item_id}/quantity", operation_id="update_item_quantity")
 def put_item_quantity(item_id: int, payload: dict[str, int]):
     if "quantity" not in payload:
         raise HTTPException(status_code=400, detail="quantity is required")
@@ -84,7 +84,7 @@ def put_item_quantity(item_id: int, payload: dict[str, int]):
     return item
 
 
-@app.put("/items/{item_id}/available")
+@app.put("/items/{item_id}/available", operation_id="update_item_availability")
 def put_item_available(item_id: int, payload: dict[str, int]):
     if "available" not in payload:
         raise HTTPException(status_code=400, detail="available is required")
@@ -101,7 +101,7 @@ def put_item_available(item_id: int, payload: dict[str, int]):
     return item
 
 
-@app.get("/items/{item_id}/restock")
+@app.get("/items/{item_id}/restock", operation_id="check_item_restock")
 def get_item_restock(item_id: int):
     result = inventory_service.check_restock(item_id=item_id, db_path=str(DB_PATH))
     if result.get("item") is None:
@@ -109,14 +109,14 @@ def get_item_restock(item_id: int):
     return result
 
 
-@app.get("/members")
+@app.get("/members", operation_id="get_members")
 def get_members():
     with database.get_connection(str(DB_PATH)) as conn:
         rows = conn.execute("SELECT * FROM members ORDER BY id").fetchall()
     return [_row_to_dict(row) for row in rows]
 
 
-@app.get("/members/{member_id}")
+@app.get("/members/{member_id}", operation_id="get_member")
 def get_member(member_id: int):
     member = members_service.get_member(member_id=member_id, db_path=str(DB_PATH))
     if member is None:
@@ -124,7 +124,7 @@ def get_member(member_id: int):
     return member
 
 
-@app.put("/members/{member_id}/resolve")
+@app.put("/members/{member_id}/resolve", operation_id="resolve_member_inquiry")
 def put_member_resolve(member_id: int, payload: dict[str, bool]):
     if "resolved" not in payload:
         raise HTTPException(status_code=400, detail="resolved is required")
@@ -138,7 +138,7 @@ def put_member_resolve(member_id: int, payload: dict[str, bool]):
     return member
 
 
-@app.get("/audit")
+@app.get("/audit", operation_id="get_audit_report")
 def get_audit():
     return inventory_service.run_audit_report(db_path=str(DB_PATH))
 

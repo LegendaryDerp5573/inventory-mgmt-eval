@@ -4,7 +4,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Update the quantity of Boxing Gloves to 20.",
       "checks": [
@@ -20,7 +20,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Mark Training Pads as unavailable.",
       "checks": [
@@ -36,7 +36,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Alice Johnson just resolved an inquiry successfully. Update her record.",
       "checks": [
@@ -52,7 +52,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A customer reported an issue with their account. Log an unresolved inquiry for Bob Smith.",
       "checks": [
@@ -68,7 +68,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Restock Hand Wraps to 15 units and make sure availability is correct.",
       "checks": [
@@ -88,7 +88,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Training Pads are out of stock. Make sure both the quantity and availability reflect this correctly.",
       "checks": [
@@ -108,7 +108,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Carlos Rivera just had an inquiry that was successfully resolved. Update his record to reflect both the new inquiry and its resolution.",
       "checks": [
@@ -128,7 +128,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Find the item with the lowest current stock and restock it to exactly double its threshold.",
       "checks": [
@@ -144,7 +144,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A shipment arrived with 10 units of Jump Rope. Add them to the existing stock and update availability accordingly.",
       "checks": [
@@ -164,7 +164,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Find all items that are currently marked unavailable and set their quantity to 0 to make the records consistent.",
       "checks": [
@@ -188,7 +188,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "The member with the most unresolved inquiries needs their record updated with one more unresolved inquiry.",
       "checks": [
@@ -208,7 +208,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Bring all items that are below their restock threshold up to exactly their threshold quantity and update availability.",
       "checks": [
@@ -236,7 +236,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Find the member with the highest resolution rate and log one more successfully resolved inquiry for them.",
       "checks": [
@@ -252,7 +252,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A new shipment arrived. Add 5 units to every item that is currently marked unavailable and update their availability status.",
       "checks": [
@@ -288,7 +288,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Evan Park contacted us with two new inquiries today \u2014 one was resolved and one was not. Update his record.",
       "checks": [
@@ -308,7 +308,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Check which items need restocking and update all of them to double their threshold quantity. Make sure availability is correct for each.",
       "checks": [
@@ -344,7 +344,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Find the item with the highest quantity in stock and reduce it by half. Round down if needed.",
       "checks": [
@@ -360,7 +360,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "We are doing a temporary closure. Mark every item that is at or below its restock threshold as unavailable, but leave everything else as is.",
       "checks": [
@@ -396,7 +396,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A staff audit found that all members with a resolution rate below 50% need to have one additional unresolved inquiry logged against their record.",
       "checks": [
@@ -424,7 +424,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "The gym is restocking for a busy season. For every item currently below threshold, add enough units to bring it to triple its threshold. Update availability for each.",
       "checks": [
@@ -460,7 +460,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "End of day report: log one resolved inquiry for every member who currently has a resolution rate above 90%.",
       "checks": [
@@ -488,7 +488,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A large order just came in and wiped out our most popular items. Set Boxing Gloves to 2 units, Mouth Guard to 3 units, and Headgear to 1 unit. Make sure availability is accurate for all three.",
       "checks": [
@@ -524,7 +524,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "A disgruntled customer filed complaints with every staff member today. Each complaint was unresolved. Log one unresolved inquiry for every member on record.",
       "checks": [
@@ -556,7 +556,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "Do a full inventory reset for low stock items: any item with quantity below 5 should be set to 0 and marked unavailable. Any item with quantity between 5 and its threshold should be brought up to its threshold and marked available.",
       "checks": [
@@ -592,7 +592,7 @@
     "env": {
       "name": "inventory-mgmt-env"
     },
-    "scenario": "workflow",
+    "scenario": "inventory-mgmt-env:workflow",
     "args": {
       "instruction": "The gym owner wants a full operational reset before opening tomorrow. Bring every item that needs restocking up to exactly its threshold. Mark everything with zero quantity as unavailable. Log one resolved inquiry for the member with the lowest resolution rate.",
       "checks": [
